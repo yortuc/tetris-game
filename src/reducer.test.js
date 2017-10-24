@@ -43,5 +43,11 @@ it('can move block left', ()=> {
 	expect(nextState.current.position[0]).toEqual(moveLeftState.current.position[0]-1)
 })
 
+it("can't move block left", ()=> {
+	const moveLeftState = {
+		...initialState,
+		move: "left"
+	}
+})
 
 

@@ -11,8 +11,11 @@ export const blocks = [
 	 [1,0],	 // *
 	 [1,1]], // **
 
-	 [[1,1,0], // **
-	  [0,1,1]] //  **
+	[[1,1,0],  // **
+	 [0,1,1]], //  **
+
+	[[1,1,1],
+	 [0,1,0]]
 ]
 
 export const defaultBoard = [
@@ -63,6 +66,68 @@ export const renderBlockOnBoard = (cells, block)=> {
 	return ret
 }
 
+// determine if the given block can move down
+// scan all pieces in the block, if the piece has a 
+//   empty space below, it should not collide with another piece
+export const canMoveDown = (cells, block)=> {
+
+	// if not reached bottom yet
+	// check other blocks for collision
+	if(block.position[1] + block.cells.length < cells.length){
+		let ret = true
+		
+		iterateBlock(block, (i,j,val)=> {
+			// i:row, j:col
+			
+			if(val===1 && ((i===block.cells.length-1) || (i<block.cells.length && block.cells[i+1][j]===0))){
+				let offX = block.position[0] + j
+				let offY = block.position[1] + i
+
+				if(cells[offY+1][offX]===1) ret = false
+
+			}
+		})
+
+		return ret
+
+	}else{
+		return false
+	}
+}
+
+export const moveVertical = (cells, block, move)=> {
+	// at left and right margins, can't move
+	let ret = block.position[0]
+
+	if(move==="left" && block.position[0]===0) return ret
+	if(move==="right" && block.position[0] + block.cells[0].length===cells[0].length) return ret
+
+	// check other blocks at left or right
+	let moveResult
+	if(move==="left"){
+		moveResult = ret - 1
+
+		iterateBlock(block, (i,j,val)=> {
+			let offX = block.position[0] + j
+			let offY = block.position[1] + i
+
+			// can't move
+			if(cells[offY][offX-1]===1) moveResult = ret
+		})
+	}
+	else if(move==="right"){
+		moveResult = ret + 1
+		iterateBlock(block, (i,j,val)=> {
+			let offX = block.position[0] + j
+			let offY = block.position[1] + i
+
+			// can't move
+			if(cells[offY][offX+1]===1) moveResult = ret
+		})
+	}
+	return moveResult
+}
+
 // iterate state with time
 export const tick = (state=initialState)=> {
 
@@ -71,6 +136,7 @@ export const tick = (state=initialState)=> {
 	const renderCells = renderBlockOnBoard(cells, current)
 	let newCells = [...cells]
 	let newCurrent = {...current}
+	let newComing = [...coming]
 
 	// check position
 	let currentX = current.position[0]
@@ -79,12 +145,8 @@ export const tick = (state=initialState)=> {
 	// move left-right
 	if(move){
 		// can move left?
-		if(move==="left" && current.position[0]>0){
-			currentX -= 1
-		}
-		if(move==="right" && current.position[0] + current.cells[0].length<cells[0].length){
-			currentX += 1
-		}
+		const currentX = moveVertical(cells, current, move)
+
 		newCurrent = {
 			...newCurrent,
 			position: [currentX, currentY]
@@ -92,10 +154,10 @@ export const tick = (state=initialState)=> {
 	}
 
 	// TODO: correlate mod with level
-	if(time % 60 === 0){
+	if(time % 40 === 0){
+
 		// can move down
-		// if current block current_y + height_y < height_board
-		if(current.position[1] + current.cells.length < cells.length){
+		if(canMoveDown(cells, current)){
 			currentY += 1
 
 			newCurrent = {
@@ -103,24 +165,22 @@ export const tick = (state=initialState)=> {
 				position: [currentX, currentY]
 			}
 		}
-
-		// hit the ground, (or on top of another block)
-		// merge current with cells
-		if(current.position[1] + current.cells.length === cells.length){
-			console.log("hit")
+		else{
+			console.log("collision")
 
 			newCells = renderBlockOnBoard(cells, current)
 			newCurrent = {
-				cells: blocks[Math.floor( blocks.length * Math.random() )],
+				cells: [...coming],
 				position: [4, 0]
 			}
+			newComing = blocks[Math.floor(Math.random() * blocks.length)]
 		}
 	}
 
 	const ret = {
 		cells:  newCells,
 		render: [...renderCells],
-		coming: [...coming],
+		coming: newComing,
 		current: newCurrent,
 		time: (time + 1)
 	}
