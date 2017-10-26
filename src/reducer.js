@@ -66,6 +66,33 @@ export const renderBlockOnBoard = (cells, block)=> {
 	return ret
 }
 
+export const handleErase = (cells)=> {
+	let erasedCells = []
+
+	for(let i=cells.length-1; i>=0; i--){
+		let rowWillBeErased = true
+		for(let j=0; j<cells[i].length; j++){
+			if(cells[i][j]===0){
+				rowWillBeErased = false	
+				break
+			}
+		}
+		if(!rowWillBeErased){
+			erasedCells = [cells[i], ...erasedCells]
+		}
+	}
+
+	if(erasedCells.length < cells.length){
+		let emptyRow = cells[0].map(c=> 0)
+
+		for(let k=0; k<cells.length - erasedCells.length; k++){
+			erasedCells = [emptyRow,...erasedCells]
+		}
+	}
+
+	return erasedCells
+}
+
 // determine if the given block can move down
 // scan all pieces in the block, if the piece has a 
 //   empty space below, it should not collide with another piece
@@ -104,34 +131,51 @@ export const moveVertical = (cells, block, move)=> {
 
 	// check other blocks at left or right
 	let moveResult
-	if(move==="left"){
-		moveResult = ret - 1
+	let offSet = (move==="left") ? -1 : 1
 
-		iterateBlock(block, (i,j,val)=> {
+	moveResult = ret + offSet
+
+	iterateBlock(block, (i,j,val)=> {
+		if(val===1){
 			let offX = block.position[0] + j
 			let offY = block.position[1] + i
 
 			// can't move
-			if(cells[offY][offX-1]===1) moveResult = ret
-		})
-	}
-	else if(move==="right"){
-		moveResult = ret + 1
-		iterateBlock(block, (i,j,val)=> {
-			let offX = block.position[0] + j
-			let offY = block.position[1] + i
+			if(cells[offY][offX+offSet]===1) moveResult = ret
+		}
+	})
 
-			// can't move
-			if(cells[offY][offX+1]===1) moveResult = ret
-		})
-	}
 	return moveResult
 }
 
-// iterate state with time
+// rotate given block on given board
+export const rotateBlock = (cells, block)=> {
+	// create an empty array
+	let transposed = []
+	for(let i=0; i<block.cells[0].length; i++){
+		let r = []
+		for(let j=0; j<block.cells.length; j++){
+			r.push(0)
+		}
+		transposed.push(r)
+	}
+
+	// TODO: check collisions before rotation
+	
+	// transpose values
+	for(let i=0; i<block.cells.length; i++){
+		for(let j=0; j<block.cells[0].length; j++){
+			transposed[j][i] = block.cells[i][j]
+		}
+	}
+
+	return transposed
+}
+
+// iterate state within time
 export const tick = (state=initialState)=> {
 
-	const { current, coming, cells, move, time } = state
+	const { current, coming, cells, move, rotate, time } = state
 
 	const renderCells = renderBlockOnBoard(cells, current)
 	let newCells = [...cells]
@@ -144,12 +188,20 @@ export const tick = (state=initialState)=> {
 
 	// move left-right
 	if(move){
-		// can move left?
-		const currentX = moveVertical(cells, current, move)
+		currentX = moveVertical(cells, current, move)
 
 		newCurrent = {
 			...newCurrent,
 			position: [currentX, currentY]
+		}
+	}
+
+	if(rotate){
+		console.log("rotation")
+
+		newCurrent = {
+			...newCurrent,
+			cells: rotateBlock(cells, current)
 		}
 	}
 
@@ -174,6 +226,8 @@ export const tick = (state=initialState)=> {
 				position: [4, 0]
 			}
 			newComing = blocks[Math.floor(Math.random() * blocks.length)]
+
+			newCells = handleErase(newCells)
 		}
 	}
 

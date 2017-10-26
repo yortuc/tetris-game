@@ -19,27 +19,24 @@ gameState = {
 gameState -> 
 */ 
 
-const reqAF = window.requestAnimationFrame
-
 let gameState
 
 const render = (state)=> {
 
 	gameState = tick(state)
 
-	// console.log(gameState.time)
-
 	ReactDOM.render(
 		<div>
 			<TetrisGame cells = { gameState.render }
 					  current = { gameState.current }
 					   coming = { gameState.coming } 
-		        onMoveRequest = { move=> gameState={...gameState, move} }/>
+		        onMoveRequest = { move=> gameState={...gameState, move} }
+		             onRotate = { rotate=> gameState={...gameState, rotate} } />
 		</div>, 
 		document.getElementById('root')
 	)
 
-	reqAF(()=> render(gameState))
+	window.requestAnimationFrame(()=> render(gameState))
 }
 
 render()
