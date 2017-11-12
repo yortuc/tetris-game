@@ -1,23 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TetrisGame from './components/TetrisGame'
-import {tick} from './reducer'  
+import { tick } from './reducer'  
 import './index.css'
-
-/*
-
-gameState = {
-	cells, [[]],
-	current: {
-		cells: [[1,1],
-		        [1,1]],
-		position: [4, 0] 
-	},
-	coming: [[1,1,1,1]]
-}
-
-gameState -> 
-*/ 
 
 let gameState
 

@@ -1,6 +1,5 @@
-import React, {Component} from 'react'
+import React from 'react'
 import Board from './Board'
-import { computeCells } from '../reducer'
 
 const TetrisGame = ({ cells, coming, onMoveRequest, onRotate })=> (
 	<div>
