@@ -10,6 +10,7 @@ table.Board{
 	margin-right: auto;
 	border-spacing: 0;
 	border-collapse: collapse;
+	box-shadow: 0 0 10px #444;
 }
 
 table.Board td {
@@ -27,6 +28,3 @@ div.Coming {
 	width: 50%;
 	height: 30px;
 }
-
-/*
-*/
