@@ -2,12 +2,15 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  background-color: #eee;
+  background-color: #e0e5e0;
 }
 
 table.Board{
 	margin-left: auto;
 	margin-right: auto;
+	border-spacing: 0;
+	border-collapse: collapse;
+	box-shadow: 0 0 10px #444;
 }
 
 table.Board td {
@@ -25,6 +28,3 @@ div.Coming {
 	width: 50%;
 	height: 30px;
 }
-
-/*
-*/
