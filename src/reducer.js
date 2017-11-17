@@ -60,7 +60,7 @@ export const iterateBlock = (block, cb)=> {
 }
 
 // render given block on given board
-export const renderBlockOnBoard = (cells, block)=> {
+export const putTetrominoOnBoard = (cells, block)=> {
 	let ret = cells.map(row=> row.map(col=> col))
 
 	iterateBlock(block, (i, j, val)=> {
@@ -183,7 +183,7 @@ export const tick = (state=initialState)=> {
 
 	const { current, coming, cells, move, rotate, time } = state
 
-	const renderCells = renderBlockOnBoard(cells, current)
+	const renderCells = putTetrominoOnBoard(cells, current)
 	let newCells = [...cells]
 	let newCurrent = {...current}
 	let newComing = [...coming]
@@ -226,7 +226,7 @@ export const tick = (state=initialState)=> {
 		else{
 			console.log("collision")
 
-			newCells = renderBlockOnBoard(cells, current)
+			newCells = putTetrominoOnBoard(cells, current)
 			newCurrent = {
 				cells: [...coming],
 				position: [4, 0]

@@ -4,31 +4,28 @@
 
 import { 
 	initialState, 
-	renderBlockOnBoard, 
+	putTetrominoOnBoard, 
 	tick, 
 	rotateBlock,
 	handleErase
 } from './reducer'
 
-it('renderBlockOnBoard(cells, block) : can render a block onto a board', () => {
-  
-  	/*
-		00   10  -> 10    
-		00          00
-  	*/
-	const cells = [[0,0],
-                   [0,0]]
-	const block = {
-		cells: [[1,0]],
+it('render a block onto a board', () => {
+
+	const emptyBoard = [[0,0],
+                        [0,0]]
+
+	const tetromino = {
+		cells:   [[1,0]],
 		position: [0, 0]
 	}
 
-	const result = [[1,0],
-	                [0,0]]
+	const expectedBoard = [[1,0],
+	                       [0,0]]
 
-	const computed = renderBlockOnBoard(cells, block)
+	const actualBoard = putTetrominoOnBoard(emptyBoard, tetromino)
 
-	expect(computed).toEqual(result)
+	expect(actualBoard).toEqual(expectedBoard)
 })
 
 it('tick(state) can compute next state', ()=> {
@@ -80,8 +77,7 @@ it('rotateBlock can rotate given block', ()=> {
 	expect(computed).toEqual(rotated)
 })
 
-/*
-it('handle rotations with collision', ()=> {
+xit('handle rotations with collision', ()=> {
 	const rotateState = {...initialState, rotate: "r"}
 	const nextState = tick(rotateState)
 
@@ -95,7 +91,8 @@ it('handle rotations with collision', ()=> {
 	const rotatedBlock = [[1,1,1,1]]
 
 	expect(nextState.current.cells).toEqual(rotatedBlock)
-})*/
+	return false
+})
 
 it('handle erase blocks', ()=> {
 	const cells =    [[0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
@@ -108,6 +105,3 @@ it('handle erase blocks', ()=> {
 
 	expect(computed).toEqual(expected)
 })
-
-
-
